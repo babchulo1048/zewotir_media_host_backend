@@ -9,7 +9,12 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 const corsOptions = {
-  origin: "http://localhost:3000", // 🌟 ONLY ALLOW REQUESTS FROM YOUR FRONT-END PORT
+  origin: [
+    "http://localhost:3000",
+    "http://localhost:8080", // 🌟 Also allow requests from port 8080
+    "https://zewotiralemu.netlify.app",
+    "https://zewotiralemudashboard.netlify.app",
+  ],
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE", // Allow these HTTP methods
   credentials: true, // Allow cookies/authorization headers to be sent
   optionsSuccessStatus: 204, // Some legacy browsers choke on 200
