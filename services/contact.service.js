@@ -41,6 +41,20 @@ const processInquiry = async (data) => {
   };
 };
 
+// 🆕 Fetch all inquiries
+const fetchAllInquiries = async () => {
+  return await contactModel.getAllInquiries();
+};
+
+// 🆕 Fetch single inquiry by ID
+const fetchInquiryById = async (id) => {
+  const inquiry = await contactModel.getInquiryById(id);
+  if (!inquiry) throw new Error("Inquiry not found.");
+  return inquiry;
+};
+
 module.exports = {
   processInquiry,
+  fetchAllInquiries,
+  fetchInquiryById,
 };

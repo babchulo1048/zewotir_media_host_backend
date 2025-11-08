@@ -1,28 +1,28 @@
 // services/portfolio.service.js
 const assetModel = require("../src/models/asset.model");
 
+// --- Define the 5 Valid Types ---
+const validTypes = ["tvhost", "mcing", "interviews", "voiceover", "art"];
+
 // --- 1. Creation Logic ---
 const createNewAsset = async (assetData) => {
-  console.log("assetdata:", assetData);
+  console.log("assetData:", assetData);
   // Input validation
   if (!assetData.title || !assetData.asset_type) {
     throw new Error("Missing required fields: title and asset_type.");
   }
 
-  // Ensure asset_type is valid (though DB schema handles this with ENUM)
-  const validTypes = ["media", "voiceover", "art"];
+  // Ensure asset_type is valid (UPDATED VALIDATION)
   if (!validTypes.includes(assetData.asset_type)) {
-    throw new Error("Invalid asset type provided.");
+    throw new Error("Invalid asset type provided for creation.");
   }
 
-  console.log("TYPE:", assetData.asset_type);
-  console.log("AUDIO URL:", assetData.audioUrl);
-
   let primaryLink = assetData.link || null;
-  // FIX: Explicitly check for audioUrl (set by middleware) if it's a voiceover
+  // Check for audioUrl if it's voiceover (logic remains the same)
   if (assetData.asset_type === "voiceover" && assetData.audioUrl) {
     primaryLink = assetData.audioUrl;
   }
+
   // Format data for the model
   const newAssetData = {
     title: assetData.title,
@@ -39,19 +39,19 @@ const createNewAsset = async (assetData) => {
   return newAsset;
 };
 
-// --- 2. Retrieval Logic ---
+// --- 2. Retrieval Logic (SIMPLIFIED) ---
 const getAssets = async (type) => {
-  // Basic validation on the requested type
-  const validTypes = ["media", "voiceover", "art"];
+  // Now, the type passed from the frontend URL directly matches the DB ENUM
   if (!validTypes.includes(type)) {
     throw new Error("Invalid asset type requested for retrieval.");
   }
 
+  // Directly use the type to fetch assets
   const assets = await assetModel.getAssetsByType(type);
   return assets;
 };
 
-// --- 3. Update Logic (UPDATE /assets/:id) ---
+// --- 3. Update Logic ---
 const updateExistingAsset = async (id, assetData) => {
   const assetId = parseInt(id);
 
@@ -61,17 +61,16 @@ const updateExistingAsset = async (id, assetData) => {
     throw new Error(`Asset with ID ${assetId} not found.`);
   }
 
-  // 2. Prepare Data for Update
-  // NOTE: Cloudinary middleware already placed new file URLs (thumbnail_url, audioUrl) into req.body/assetData.
+  // Validate the new asset type if provided
+  const newAssetType = assetData.asset_type || existingAsset.asset_type;
+  if (!validTypes.includes(newAssetType)) {
+    throw new Error("Invalid asset type provided for update.");
+  }
 
-  // Handle primary link update logic (similar to create)
-  let primaryLink = assetData.link || existingAsset.link_url; // Use existing if not provided
+  // 2. Prepare Data for Update (Link logic remains the same for voiceover)
+  let primaryLink = assetData.link || existingAsset.link_url;
 
-  if (
-    assetData.asset_type === "voiceover" ||
-    existingAsset.asset_type === "voiceover"
-  ) {
-    // Prioritize the new audioUrl if provided, otherwise use existing link_url
+  if (newAssetType === "voiceover") {
     primaryLink = assetData.audioUrl || primaryLink;
   }
 
@@ -81,7 +80,7 @@ const updateExistingAsset = async (id, assetData) => {
     asset_type: assetData.asset_type,
     description: assetData.description,
     link_url: primaryLink,
-    thumbnail_url: assetData.thumbnail_url, // URL from middleware (if new file uploaded)
+    thumbnail_url: assetData.thumbnail_url,
     details: assetData.type_specific_details,
   };
 
@@ -90,17 +89,15 @@ const updateExistingAsset = async (id, assetData) => {
   return updatedAsset;
 };
 
-// --- 4. Delete Logic (DELETE /assets/:id) ---
+// --- 4. Delete Logic (No Change) ---
 const deleteAssetById = async (id) => {
   const assetId = parseInt(id);
 
-  // 1. Check if asset exists (optional, but good for reporting)
   const existingAsset = await assetModel.getAssetById(assetId);
   if (!existingAsset) {
     throw new Error(`Asset with ID ${assetId} not found.`);
   }
 
-  // 2. Perform soft delete
   const deletedRow = await assetModel.deleteAsset(assetId);
   if (!deletedRow) {
     throw new Error(`Failed to delete asset ID ${assetId}.`);
@@ -112,6 +109,6 @@ const deleteAssetById = async (id) => {
 module.exports = {
   createNewAsset,
   getAssets,
-  updateExistingAsset, // <--- NEW
-  deleteAssetById, // <--- NEW
+  updateExistingAsset,
+  deleteAssetById,
 };

@@ -15,6 +15,22 @@ const saveInquiry = async (data) => {
   return rows[0];
 };
 
+// 🆕 Fetch all inquiries
+const getAllInquiries = async () => {
+  const { rows } = await query(
+    "SELECT * FROM inquiries ORDER BY created_at DESC"
+  );
+  return rows;
+};
+
+// 🆕 Fetch inquiry by ID
+const getInquiryById = async (id) => {
+  const { rows } = await query("SELECT * FROM inquiries WHERE id = $1", [id]);
+  return rows[0];
+};
+
 module.exports = {
   saveInquiry,
+  getAllInquiries,
+  getInquiryById,
 };
