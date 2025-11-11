@@ -19,7 +19,7 @@ const createArticle = async (data) => {
 // --- 2. GET All Published Articles (used for GET /articles) ---
 const getPublishedArticles = async () => {
   const text = `
-        SELECT id, title, excerpt, category, featured_image_url, created_at 
+        SELECT id, title, excerpt, category, content, featured_image_url, created_at 
         FROM articles 
         WHERE is_published = TRUE 
         ORDER BY created_at DESC

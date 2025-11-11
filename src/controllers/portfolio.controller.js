@@ -83,9 +83,21 @@ const deletePortfolioAsset = async (req, res) => {
   }
 };
 
+// --- 5. GET All Assets Controller ---
+const getAllAssets = async (req, res) => {
+  try {
+    const assets = await portfolioService.getAllAssets();
+    res.status(200).json(assets);
+  } catch (error) {
+    console.error("Error fetching all assets:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   createPortfolioAsset,
   getAssetsByType,
   updatePortfolioAsset, // <--- NEW
   deletePortfolioAsset, // <--- NEW
+  getAllAssets,
 };

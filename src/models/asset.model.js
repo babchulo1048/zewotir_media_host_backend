@@ -81,10 +81,22 @@ const deleteAsset = async (id) => {
   return rows[0];
 };
 
+// --- 6. GET ALL Assets (Used for GET /assets) ---
+const getAllAssets = async () => {
+  const text = `
+    SELECT * FROM assets
+    WHERE is_active = TRUE
+    ORDER BY created_at DESC
+  `;
+  const { rows } = await query(text);
+  return rows;
+};
+
 module.exports = {
   createAsset,
   getAssetsByType,
   getAssetById, // <--- NEW
   updateAsset, // <--- NEW
   deleteAsset, // <--- NEW
+  getAllAssets,
 };
