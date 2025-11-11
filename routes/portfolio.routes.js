@@ -8,6 +8,8 @@ const uploadMiddleware = require("../middleware/upload.middleware"); // <--- NEW
 // GET /api/v1/portfolio/assets/media (Public access)
 router.get("/assets/:type", portfolioController.getAssetsByType);
 
+router.get("/assets", portfolioController.getAllAssets);
+
 // POST /api/v1/portfolio/assets (Requires Admin access AND file upload handling)
 router.post(
   "/assets",
@@ -36,7 +38,5 @@ router.delete(
   authMiddleware.isAdmin,
   portfolioController.deletePortfolioAsset
 );
-
-module.exports = router;
 
 module.exports = router;

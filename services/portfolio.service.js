@@ -17,11 +17,8 @@ const createNewAsset = async (assetData) => {
     throw new Error("Invalid asset type provided for creation.");
   }
 
-  let primaryLink = assetData.link || null;
-  // Check for audioUrl if it's voiceover (logic remains the same)
-  if (assetData.asset_type === "voiceover" && assetData.audioUrl) {
-    primaryLink = assetData.audioUrl;
-  }
+  const primaryLink =
+    assetData.link_url || assetData.link || assetData.audioUrl || null;
 
   // Format data for the model
   const newAssetData = {
@@ -106,9 +103,15 @@ const deleteAssetById = async (id) => {
   return { id: assetId };
 };
 
+const getAllAssets = async () => {
+  const assets = await assetModel.getAllAssets();
+  return assets;
+};
+
 module.exports = {
   createNewAsset,
   getAssets,
   updateExistingAsset,
   deleteAssetById,
+  getAllAssets,
 };
